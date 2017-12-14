@@ -21,7 +21,6 @@ public interface RoleMapper {
 	 * @return
 	 */
 	@Insert(value="INSERT INTO role(role_name,role_desc) VALUES " + "(#{role.role_name},#{role.role_desc})")
-	@Options(useGeneratedKeys=true, keyProperty="uuid", keyColumn="uuid")
 	public int addRole(@Param("role") Role role);
 
 	/**
@@ -46,7 +45,7 @@ public interface RoleMapper {
 	 * @return
 	 */
 	@Select("select * from role where uuid=#{roleid}")
-	public Role getUsersAuthority(@Param("roleid") String roleid);
+	public Role getUsersAuthority(@Param("roleid") int roleid);
 	
 
 	/**
