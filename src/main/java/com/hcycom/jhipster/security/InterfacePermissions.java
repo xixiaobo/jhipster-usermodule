@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import com.hcycom.jhipster.domain.Role;
 import com.hcycom.jhipster.service.mapper.ProductMapper;
 
 @Component("InterfacePermissions")
@@ -26,7 +25,7 @@ public class InterfacePermissions {
         while(iterator.hasNext()){
             GrantedAuthority ga = iterator.next();
             for (String role : roles) {
-            	if(role.equals(ga.getAuthority())){
+            	if(role.equals(ga.getAuthority())||ga.getAuthority().equals("ROLE_ADMIN")){
             		return true;
             	}
     		}    

@@ -38,6 +38,14 @@ public interface RoleMapper {
 	 */
 	@Delete("delete from role where uuid=#{role.uuid}")
 	public int deleteRole(@Param("role") Role role);
+	
+	/**
+	 * 根据角色的uuid删除角色的所属权限
+	 * @param role
+	 * @return
+	 */
+	@Delete("delete from role_authority where role_uuid=#{role.uuid}")
+	public int deleteRole_Auth(@Param("role") Role role);
 
 	/**
 	 * 根据uuid查询角色信息
