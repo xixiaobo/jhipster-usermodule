@@ -24,8 +24,11 @@ public class InterfacePermissions {
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         while(iterator.hasNext()){
             GrantedAuthority ga = iterator.next();
+            if(ga.getAuthority().equals("ROLE_ADMIN")){
+            	return true;
+            }
             for (String role : roles) {
-            	if(role.equals(ga.getAuthority())||ga.getAuthority().equals("ROLE_ADMIN")){
+            	if(role.equals(ga.getAuthority())){
             		return true;
             	}
     		}    
