@@ -20,25 +20,25 @@ public interface Role_authorityMapper {
 	 * @param Role_authority
 	 * @return
 	 */
-	@Insert(value = "INSERT INTO Role_authority(role_uuid,authority_uuid) VALUES "
+	@Insert(value = "INSERT INTO role_authority(role_uuid,authority_uuid) VALUES "
 			+ "(#{role_authority.role_uuid},#{role_authority.authority_uuid})")
 	public int addRole_authority(@Param("role_authority") Role_authority role_authority);
 
 	
 	/**
-	 * 根据uuid删除角色信息
+	 * 根据角色的uuid和权限的uuid删除角色信息
 	 * @param Role_authority
 	 * @return
 	 */
-	@Delete("delete from Role_authority where uuid=#{uuid}")
-	public int deleteRole_authority(@Param("uuid")int uuid);
+	@Delete("delete from role_authority where role_uuid=#{role_authority.role_uuid} and authority_uuid=#{role_authority.authority_uuid}")
+	public int deleteRole_authorityByRoleAndAuthority(@Param("role_authority") Role_authority role_authority);
 	
 	/**
 	 * 根据角色的uuid删除角色的所属权限
 	 * @param Role_authority
 	 * @return
 	 */
-	@Delete("delete from Role_authority where role_uuid=#{roleuuid}")
+	@Delete("delete from role_authority where role_uuid=#{roleuuid}")
 	public int deleteRole_authorityByRole(@Param("roleuuid")int roleuuid);
 
 	/**
@@ -55,18 +55,18 @@ public interface Role_authorityMapper {
 	 * @param Role_authorityid
 	 * @return
 	 */
-	@Select("select * from Role_authority where uuid=#{uuid}")
+	@Select("select * from role_authority where uuid=#{uuid}")
 	public Role_authority getRole_authorityByUuid(@Param("uuid") int uuid);
 
 	/**
 	 * 查询所有角色权限
 	 * @return
 	 */
-	@Select("select * from Role_authority")
+	@Select("select * from role_authority")
 	public List<Role_authority> getAllRole_authority();
 	
 
-	@Select("select * from Role_authority where role_uuid=#{role_uuid}")
+	@Select("select * from role_authority where role_uuid=#{role_uuid}")
 	public List<Role_authority> getAllRole_authorityByRole_uuid(@Param("role_uuid")int role_uuid);
 
 }
