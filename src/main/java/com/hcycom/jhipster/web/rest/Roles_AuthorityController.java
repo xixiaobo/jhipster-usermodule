@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
@@ -59,21 +58,21 @@ public class Roles_AuthorityController {
 	public ResponseEntity<Map<String, Object>> role_authority(@RequestBody Role_authoritys role_authoritys) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Role_authority> list = role_authorityMapper.getAllRole_authorityByRole_uuid(role_authoritys.getRoleid());
-		List<Integer> ids = new ArrayList<Integer>();
+		List<String> ids = new ArrayList<String>();
 		for (Role_authority role_authority : list) {
 			ids.add(role_authority.getAuthority_uuid());
 		}
-		List<Integer> ids2 = ids;
-		List<Integer> newAuthorityids = new ArrayList<Integer>(Arrays.asList(role_authoritys.getAuthorityids()));
+		List<String> ids2 = ids;
+		List<String> newAuthorityids = new ArrayList<String>(Arrays.asList(role_authoritys.getAuthorityids()));
 		ids.removeAll(newAuthorityids);
 		newAuthorityids.removeAll(ids2);
-		for (Integer id : ids) {
+		for (String id : ids) {
 			Role_authority role_authority = new Role_authority();
 			role_authority.setRole_uuid(role_authoritys.getRoleid());
 			role_authority.setAuthority_uuid(id);
 			role_authorityMapper.deleteRole_authorityByRoleAndAuthority(role_authority);
 		}
-		for (Integer id : newAuthorityids) {
+		for (String id : newAuthorityids) {
 			Role_authority role_authority = new Role_authority();
 			role_authority.setRole_uuid(role_authoritys.getRoleid());
 			role_authority.setAuthority_uuid(id);
@@ -89,12 +88,11 @@ public class Roles_AuthorityController {
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_delete')")
 	@ApiOperation(value = "删除角色权限", notes = "根据角色id和权限id删除角色权限", httpMethod = "DELETE")
-	public ResponseEntity<Map<String, Object>> role_authority_delete(@RequestBody int roleid,
-			@RequestBody int authorityid) {
+	public ResponseEntity<Map<String, Object>> role_authority_delete(@RequestBody Role_authoritys role_authoritys) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Role_authority role_authority = new Role_authority();
-		role_authority.setAuthority_uuid(authorityid);
-		role_authority.setRole_uuid(roleid);
+		role_authority.setAuthority_uuid(role_authoritys.getAuthorityid());
+		role_authority.setRole_uuid(role_authoritys.getRoleid());
 		int i = role_authorityMapper.deleteRole_authorityByRoleAndAuthority(role_authority);
 		if (i == 0) {
 			map.put("msg", "角色权限删除失败！");
@@ -116,7 +114,7 @@ public class Roles_AuthorityController {
 	public ResponseEntity<Map<String, Object>> role_authority_deleteByMore(@RequestBody Role_authoritys role_authoritys) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		int i=0;
-		for (Integer authorityid : role_authoritys.getAuthorityids()) {
+		for (String authorityid : role_authoritys.getAuthorityids()) {
 			Role_authority role_authority = new Role_authority();
 			role_authority.setAuthority_uuid(authorityid);
 			role_authority.setRole_uuid(role_authoritys.getRoleid());
@@ -139,7 +137,7 @@ public class Roles_AuthorityController {
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_deleteByAll')")
 	@ApiOperation(value = "删除角色所有权限", notes = "根据角色id删除角色所拥有的所有权限", httpMethod = "DELETE")
-	public ResponseEntity<Map<String, Object>> role_authority_deleteByAll(@RequestParam("roleid") int roleid) {
+	public ResponseEntity<Map<String, Object>> role_authority_deleteByAll(@RequestBody String roleid) {
 		Map<String, Object> map = new HashMap<String, Object>();
 			int i = role_authorityMapper.deleteRole_authorityByRole(roleid);
 		if (i == 0) {
@@ -189,9 +187,10 @@ public class Roles_AuthorityController {
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleAuthority')")
 	@ApiOperation(value = "获取角色权限", notes = "获取角色拥有的所有权限", httpMethod = "GET")
-	public ResponseEntity<Map<String, Object>> getRoleAuthority(@PathVariable int roleid) {
+	public ResponseEntity<Map<String, Object>> getRoleAuthority(@PathVariable String roleid) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Role role=roleMapper.getUsersAuthority(roleid);
+		Role role=new Role();
+		role=roleMapper.getUsersAuthority(roleid);
 		if(role.getRole_name().equals("ROLE_ADMIN")){
 			List<Authority> list=authorityMapper.getAllAuthorityByInterface();
 			map.put("data", list);

@@ -2,13 +2,14 @@ package com.hcycom.jhipster.domain;
 
 public class Role {
 	
-	private int uuid;
+	private String uuid;
 	private String role_name;
 	private String role_desc;
-	public int getUuid() {
+	
+	public String getUuid() {
 		return uuid;
 	}
-	public void setUuid(int uuid) {
+	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
 	public String getRole_name() {

@@ -3,30 +3,28 @@ package com.hcycom.jhipster.web.rest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.hcycom.jhipster.domain.Attribute_values;
 import com.hcycom.jhipster.domain.Role;
-import com.hcycom.jhipster.security.AuthoritiesConstants;
+import com.hcycom.jhipster.service.mapper.Attribute_valuesMapper;
 import com.hcycom.jhipster.service.mapper.RoleMapper;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 /**
  * 资源管理接口
@@ -43,6 +41,9 @@ public class RolesController {
 	@Autowired
 	private RoleMapper roleMapperr;
 
+	@Autowired
+	private Attribute_valuesMapper attribute_valuesMapper;
+
 	@RequestMapping(value = "/role", method = RequestMethod.POST)
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/role')")
@@ -51,22 +52,24 @@ public class RolesController {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Role role2 = roleMapperr.getRoleByRole_name(role.getRole_name());
 		int i = 0;
-		if (role2 == null && role2.getRole_name().equals("")) {
+		if (role2 == null) {
+			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+			role.setUuid(uuid);
 			i = roleMapperr.addRole(role);
 			if (i == 0) {
 				map.put("msg", "角色【" + role.getRole_name() + "】创建失败！");
-				map.put("error_code", 1);
+				map.put("error_code", 0);
 			} else if (i > 0) {
 				map.put("data", role);
 				map.put("msg", "角色【" + role.getRole_name() + "】创建成功！");
-				map.put("error_code", 0);
+				map.put("error_code", 1);
 			} else {
 				map.put("msg", "服务器出问题了！");
 				map.put("error_code", 2);
 			}
 		} else {
 			map.put("msg", "角色已经存在！");
-			map.put("error_code", 1);
+			map.put("error_code", 0);
 		}
 
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
@@ -81,21 +84,21 @@ public class RolesController {
 
 		Role role2 = roleMapperr.getRoleByRole_name(role.getRole_name());
 		int i = 0;
-		if (role.getUuid() == 1 || role.getUuid() == 2) {
+		if (role.getUuid().equals("1") || role.getUuid().equals("2")) {
 			map.put("msg", "默认角色不可修改！");
 			map.put("error_code", 1);
-		} else if (role2 != null && role2.getUuid() != role.getUuid()) {
+		} else if (role2 != null && !role2.getUuid().equals(role.getUuid())) {
 			map.put("msg", "角色已经存在修改失败！");
 			map.put("error_code", 1);
 		} else {
 			i = roleMapperr.updateRole(role);
 			if (i == 0) {
 				map.put("msg", "角色【" + role.getRole_name() + "】修改失败！");
-				map.put("error_code", 1);
+				map.put("error_code", 0);
 			} else if (i > 0) {
 				map.put("data", role);
 				map.put("msg", "角色【" + role.getRole_name() + "】修改成功！");
-				map.put("error_code", 0);
+				map.put("error_code", 1);
 			} else {
 				map.put("msg", "服务器出问题了！");
 				map.put("error_code", 2);
@@ -109,23 +112,28 @@ public class RolesController {
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/role_delete/{uuid}')")
 	@ApiOperation(value = "删除角色", notes = "传入角色表参数，根据角色id删除角色", httpMethod = "DELETE")
-	public ResponseEntity<Map<String, Object>> role_delete(@PathVariable int uuid) {
+	public ResponseEntity<Map<String, Object>> role_delete(@PathVariable String uuid) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Role role = new Role();
 		role.setUuid(uuid);
-		if (role.getUuid() == 1 || role.getUuid() == 2) {
+		if (role.getUuid().equals("1") || role.getUuid().equals("2")) {
 			map.put("msg", "默认角色不可删除！");
 			map.put("error_code", 1);
 		} else {
 			int i = roleMapperr.deleteRole(role);
 			if (i == 0) {
 				map.put("msg", "角色【" + role.getRole_name() + "】删除失败！");
-				map.put("error_code", 1);
+				map.put("error_code", 0);
 			} else if (i > 0) {
 				roleMapperr.deleteRole_Auth(role);
+				Attribute_values attribute_values = new Attribute_values();
+				attribute_values.setResource_name("user");
+				attribute_values.setAttribute_key("roles");
+				attribute_values.setValue(uuid + ",");
+				attribute_valuesMapper.replaceUpdateAttribute_values(attribute_values);
 				map.put("data", role);
 				map.put("msg", "角色【" + role.getRole_name() + "】删除成功！");
-				map.put("error_code", 0);
+				map.put("error_code", 1);
 			} else {
 				map.put("msg", "服务器出问题了！");
 				map.put("error_code", 2);
@@ -134,11 +142,41 @@ public class RolesController {
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/role_deleteByMore", method = RequestMethod.DELETE)
+	@Timed
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/role_deleteByMore')")
+	@ApiOperation(value = "批量删除角色", notes = "根据角色id数组，批量删除角色", httpMethod = "DELETE")
+	public ResponseEntity<Map<String, Object>> role_deleteByMore(@RequestBody String[] uuids) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		for (String uuid : uuids) {
+			Role role = new Role();
+			role.setUuid(uuid);
+			if (role.getUuid().equals("1") || role.getUuid().equals("2")) {
+				map.put("msg", "默认角色不可删除！");
+				map.put("error_code", 0);
+				return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+			} else {
+				roleMapperr.deleteRole(role);
+				roleMapperr.deleteRole_Auth(role);
+				Attribute_values attribute_values = new Attribute_values();
+				attribute_values.setResource_name("user");
+				attribute_values.setAttribute_key("roles");
+				attribute_values.setValue(uuid + ",");
+				attribute_valuesMapper.replaceUpdateAttribute_values(attribute_values);
+			}
+
+		}
+		map.put("msg", "角色批量删除成功！");
+		map.put("error_code", 1);
+
+		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/role_get/{uuid}", method = RequestMethod.GET)
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/role_get/{uuid}')")
 	@ApiOperation(value = "获取角色", notes = "传入资源表参数，根据角色id获取角色", httpMethod = "GET")
-	public ResponseEntity<Map<String, Object>> resource_get(@PathVariable int uuid) {
+	public ResponseEntity<Map<String, Object>> resource_get(@PathVariable String uuid) {
 		log.info("request roleuuid：" + uuid);
 		Role role = new Role();
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -146,12 +184,10 @@ public class RolesController {
 		if (role != null) {
 			map.put("data", role);
 			map.put("msg", "角色【" + role.getRole_name() + "】获取成功！");
-			map.put("error_code", 0);
-			log.info("resource：" + map);
+			map.put("error_code", 1);
 		} else {
-			map.put("msg", "服务器出问题了！");
-			map.put("error_code", 2);
-			log.info("resource：" + map);
+			map.put("msg", "角色获取失败或为空！");
+			map.put("error_code", 0);
 		}
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	}
@@ -166,12 +202,13 @@ public class RolesController {
 		if (roles.size() > 0) {
 			map.put("data", roles);
 			map.put("msg", "所有角色获取成功！");
+			map.put("error_code", 1);
+		} else if (roles.size() <= 0) {
+			map.put("msg", "所有角色获取失败或为空！");
 			map.put("error_code", 0);
-			log.info("resource：" + map);
 		} else {
 			map.put("msg", "服务器出问题了！");
 			map.put("error_code", 2);
-			log.info("resource：" + map);
 		}
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	}

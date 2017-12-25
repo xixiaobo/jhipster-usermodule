@@ -1,10 +1,5 @@
 package com.hcycom.jhipster.config;
 
-import com.hcycom.jhipster.config.oauth2.OAuth2JwtAccessTokenConverter;
-import com.hcycom.jhipster.config.oauth2.OAuth2Properties;
-import com.hcycom.jhipster.security.oauth2.OAuth2SignatureVerifierClient;
-import com.hcycom.jhipster.security.AuthoritiesConstants;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +12,12 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.client.RestTemplate;
+
+import com.hcycom.jhipster.config.oauth2.OAuth2JwtAccessTokenConverter;
+import com.hcycom.jhipster.config.oauth2.OAuth2Properties;
+import com.hcycom.jhipster.security.AuthoritiesConstants;
+import com.hcycom.jhipster.security.oauth2.OAuth2SignatureVerifierClient;
 
 @Configuration
 @EnableResourceServer

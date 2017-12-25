@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import com.hcycom.jhipster.domain.Role_authority;
 
@@ -39,7 +38,7 @@ public interface Role_authorityMapper {
 	 * @return
 	 */
 	@Delete("delete from role_authority where role_uuid=#{roleuuid}")
-	public int deleteRole_authorityByRole(@Param("roleuuid")int roleuuid);
+	public int deleteRole_authorityByRole(@Param("roleuuid")String roleuuid);
 
 	/**
 	 * 根据角色id和权限id查询权限关系
@@ -56,7 +55,7 @@ public interface Role_authorityMapper {
 	 * @return
 	 */
 	@Select("select * from role_authority where uuid=#{uuid}")
-	public Role_authority getRole_authorityByUuid(@Param("uuid") int uuid);
+	public Role_authority getRole_authorityByUuid(@Param("uuid") String uuid);
 
 	/**
 	 * 查询所有角色权限
@@ -67,6 +66,6 @@ public interface Role_authorityMapper {
 	
 
 	@Select("select * from role_authority where role_uuid=#{role_uuid}")
-	public List<Role_authority> getAllRole_authorityByRole_uuid(@Param("role_uuid")int role_uuid);
+	public List<Role_authority> getAllRole_authorityByRole_uuid(@Param("role_uuid")String role_uuid);
 
 }

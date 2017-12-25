@@ -18,9 +18,9 @@ public interface AuthorityMapper {
 	 * @return
 	 */
 	@Select("select * from authority where uuid=#{uuid}")
-	public Authority getAuthorityByUuid(@Param("uuid")int uuid);
+	public Authority getAuthorityByUuid(@Param("uuid")String uuid);
 	/**
-	 * 
+	 * 获取所有的接口权限
 	 * @return
 	 */
 	@Select("select * from authority where authority_type=4")

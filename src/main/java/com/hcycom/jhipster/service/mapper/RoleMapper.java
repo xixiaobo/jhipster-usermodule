@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -20,7 +19,7 @@ public interface RoleMapper {
 	 * @param role
 	 * @return
 	 */
-	@Insert(value="INSERT INTO role(role_name,role_desc) VALUES " + "(#{role.role_name},#{role.role_desc})")
+	@Insert(value="INSERT INTO role(uuid,role_name,role_desc) VALUES " + "(#{role.uuid},#{role.role_name},#{role.role_desc})")
 	public int addRole(@Param("role") Role role);
 
 	/**
@@ -53,7 +52,7 @@ public interface RoleMapper {
 	 * @return
 	 */
 	@Select("select * from role where uuid=#{roleid}")
-	public Role getUsersAuthority(@Param("roleid") int roleid);
+	public Role getUsersAuthority(@Param("roleid") String roleid);
 	
 
 	/**
