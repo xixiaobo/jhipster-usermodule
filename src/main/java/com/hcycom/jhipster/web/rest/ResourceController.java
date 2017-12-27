@@ -49,7 +49,7 @@ public class ResourceController {
 	
 	@RequestMapping(value = "/resource", method = RequestMethod.POST)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource--POST')")
 	@ApiOperation(value = "创建资源", notes = "传入资源表参数，创建资源")
 	public ResponseEntity<Map<String, Object>> resource(@RequestBody Resource resource){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -70,7 +70,7 @@ public class ResourceController {
 	
 	@RequestMapping(value = "/resource_update", method = RequestMethod.PUT)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_update')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_update--PUT')")
 	@ApiOperation(value = "修改资源", notes = "传入资源表参数，根据资源名称修改资源")
 	public ResponseEntity<Map<String, Object>> resource_update(@RequestBody Resource resource){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -91,7 +91,7 @@ public class ResourceController {
 	
 	@RequestMapping(value = "/resource_delete", method = RequestMethod.DELETE)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_delete')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_delete--DELETE')")
 	@ApiOperation(value = "删除资源", notes = "传入资源表参数，根据资源名称删除资源")
 	public ResponseEntity<Map<String, Object>> resource_delete(@RequestBody Resource resource){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -124,7 +124,7 @@ public class ResourceController {
 	
 	@RequestMapping(value = "/resource_deleteMore", method = RequestMethod.DELETE)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_deleteMore')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_deleteMore--DELETE')")
 	@ApiOperation(value = "批量删除资源", notes = "根据多个资源名称resource_names批量删除资源")
 	public ResponseEntity<Map<String, Object>> resource_deleteMore(@RequestBody String[] resource_names){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -152,7 +152,7 @@ public class ResourceController {
 	
 	@RequestMapping(value = "/resource_get", method = RequestMethod.GET)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_get')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_get--GET')")
 	@ApiOperation(value = "获取资源", notes = "传入资源表参数，根据资源名称获取资源")
 	public ResponseEntity<Map<String, Object>> resource_get(@RequestParam(value = "resource_name") String resource_name){
 		Resource resource=new Resource();
@@ -171,7 +171,7 @@ public class ResourceController {
 	
 	@RequestMapping(value = "/resource_getAll", method = RequestMethod.GET)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_getAll')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/resource_getAll--GET')")
 	@ApiOperation(value = "获取所有资源", notes = "获取所有资源")
 	public ResponseEntity<Map<String, Object>> resource_getAll(){
 		Map<String, Object> map = new HashMap<String, Object>();

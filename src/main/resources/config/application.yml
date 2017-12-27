@@ -110,7 +110,7 @@ jhipster:
     mail:
         from: usermodule@localhost
     swagger:
-        default-include-pattern: /api/.*
+        default-include-pattern: /api/.*|/v2/.*
         title: usermodule API
         description: usermodule API documentation
         version: 0.0.1
@@ -119,7 +119,7 @@ jhipster:
         contact-url:
         contact-email:
         license:
-        license-url:
+        license-url: 
     ribbon:
         display-on-active-profiles: dev
 

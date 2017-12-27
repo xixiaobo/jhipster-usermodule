@@ -53,7 +53,7 @@ public class Roles_AuthorityController {
 
 	@RequestMapping(value = "/role_authority", method = RequestMethod.POST)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/role_authority')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/role_authority--POST')")
 	@ApiOperation(value = "更改角色权限", notes = "传入角色id以及权限id数组，更新角色所拥有的权限", httpMethod = "POST")
 	public ResponseEntity<Map<String, Object>> role_authority(@RequestBody Role_authoritys role_authoritys) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -86,7 +86,7 @@ public class Roles_AuthorityController {
 
 	@RequestMapping(value = "/role_authority_delete", method = RequestMethod.DELETE)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_delete')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_delete--DELETE')")
 	@ApiOperation(value = "删除角色权限", notes = "根据角色id和权限id删除角色权限", httpMethod = "DELETE")
 	public ResponseEntity<Map<String, Object>> role_authority_delete(@RequestBody Role_authoritys role_authoritys) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -109,7 +109,7 @@ public class Roles_AuthorityController {
 
 	@RequestMapping(value = "/role_authority_deleteByMore", method = RequestMethod.DELETE)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_deleteByMore')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_deleteByMore--DELETE')")
 	@ApiOperation(value = "删除多个角色权限", notes = "根据角色id和权限id数组删除角色所拥有的权限", httpMethod = "DELETE")
 	public ResponseEntity<Map<String, Object>> role_authority_deleteByMore(@RequestBody Role_authoritys role_authoritys) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -135,7 +135,7 @@ public class Roles_AuthorityController {
 	
 	@RequestMapping(value = "/role_authority_deleteByAll", method = RequestMethod.DELETE)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_deleteByAll')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication,'usermodule/api/role_authority_deleteByAll--DELETE')")
 	@ApiOperation(value = "删除角色所有权限", notes = "根据角色id删除角色所拥有的所有权限", httpMethod = "DELETE")
 	public ResponseEntity<Map<String, Object>> role_authority_deleteByAll(@RequestBody String roleid) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -185,7 +185,7 @@ public class Roles_AuthorityController {
 
 	@RequestMapping(value = "/getRoleAuthority/{roleid}", method = RequestMethod.GET)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleAuthority')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleAuthority--GET')")
 	@ApiOperation(value = "获取角色权限", notes = "获取角色拥有的所有权限", httpMethod = "GET")
 	public ResponseEntity<Map<String, Object>> getRoleAuthority(@PathVariable String roleid) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -228,7 +228,7 @@ public class Roles_AuthorityController {
 
 	@RequestMapping(value = "/getAllInterfaceAuthority", method = RequestMethod.GET)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getAllInterfaceAuthority')")
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getAllInterfaceAuthority--GET')")
 	@ApiOperation(value = "获取所有接口权限", notes = "获取所有接口权限记录", httpMethod = "GET")
 	public ResponseEntity<Map<String, Object>> getAllInterfaceAuthority() {
 		Map<String, Object> map = new HashMap<String, Object>();
