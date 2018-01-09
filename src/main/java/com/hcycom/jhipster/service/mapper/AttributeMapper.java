@@ -27,7 +27,7 @@ public interface AttributeMapper {
 	 */
 	@Insert("INSERT INTO attribute VALUES "
 			+ "(#{attribute.attribute_key},#{attribute.attribute_name},"
-			+ "#{attribute.attribute_type},#{attribute.format_str},"
+			+ "#{attribute.attribute_type},#{attribute.attribute_validate},#{attribute.format_str},"
 			+ "#{attribute.is_delete},#{attribute.is_enable},"
 			+ "#{attribute.attribute_status},#{attribute.order},"
 			+ "#{attribute.resource_name},#{attribute.resource_name_foreign}")
@@ -64,8 +64,8 @@ public interface AttributeMapper {
 	 * @return
 	 */
 	@Update("update attribute set "
-			+ "attribute_name = #{attribute.attribute_name},"
 			+ "attribute_type = #{attribute.attribute_type},"
+			+ "attribute_validate = #{attribute.attribute_validate},"
 			+ "format_str = #{attribute.format_str},"
 			+ "is_enable = #{attribute.is_enable},"
 			+ "attribute_status = #{attribute.attribute_status},"
@@ -79,7 +79,7 @@ public interface AttributeMapper {
 	 * @param attribute
 	 * @return
 	 */
-	@Select("select * from attribute WHERE resource_name_foreign=#{attribute.resource_name_foreign} AND attribute_key = #{attribute.attribute_key}")
+	@Select("select * from attribute WHERE resource_name=#{attribute.resource_name} AND attribute_key = #{attribute.attribute_key}")
 	public Attribute findAttributeByResource_nameAndAttribute_key(@Param("attribute")Attribute attribute);
 	
 
@@ -88,7 +88,7 @@ public interface AttributeMapper {
 	 * @param attribute
 	 * @return
 	 */
-	@Select("select * from attribute WHERE resource_name_foreign=#{attribute.resource_name_foreign} ORDER BY `order`")
+	@Select("select * from attribute WHERE resource_name=#{attribute.resource_name} ORDER BY `order`")
 	public List<Attribute> findAttributeByResource_name(@Param("attribute")Attribute attribute);
 	
 	/**
@@ -96,7 +96,7 @@ public interface AttributeMapper {
 	 * @param attribute
 	 * @return
 	 */
-	@Select("select attribute_key from attribute WHERE resource_name_foreign=#{attribute.resource_name_foreign} and is_delete=0")
+	@Select("select attribute_key from attribute WHERE resource_name=#{attribute.resource_name} and is_delete=0")
 	public List<String> findAttributeByResource_nameNoLimit(@Param("attribute")Attribute attribute);
 	
 	/**

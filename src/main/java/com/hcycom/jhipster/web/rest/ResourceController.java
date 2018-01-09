@@ -53,6 +53,14 @@ public class ResourceController {
 	@ApiOperation(value = "创建资源", notes = "传入资源表参数，创建资源")
 	public ResponseEntity<Map<String, Object>> resource(@RequestBody Resource resource){
 		Map<String, Object> map = new HashMap<String, Object>();
+		if(resource.getSave_table()==null){
+			resource.setSave_table("attribute_values");
+		}else if(resource.getSave_table().trim().equals("")){
+			resource.setSave_table("attribute_values");
+		}
+		if(resourceMapper.findTable(resource)==null){
+			resourceMapper.addResourceTable(resource);
+		};
 		int i=resourceMapper.addResource(resource);
 		if(i==0){
 			map.put("msg","资源【"+resource.getResource_name()+"】创建失败！");
@@ -101,6 +109,15 @@ public class ResourceController {
 			map.put("error_code", 1);
 			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 		}
+		List<String> otherTable=resourceMapper.findOtherTable(resource);
+		if (otherTable.size()==1&&resource.getResource_name().equals(otherTable.get(0))) {
+			resourceMapper.deleteResourceTable(resource);
+		}else{
+			Attribute_values attribute_values=new Attribute_values();
+			attribute_values.setResource_name(resource.getResource_name());
+			attribute_values.setSave_table(resource.getSave_table());
+			attribute_valuesMapper.deleteAttribute_valuesByResource_name(attribute_values);
+		}
 		int i=resourceMapper.deleteResource(resource);
 		if(i==0){
 			map.put("msg","资源【"+resource.getResource_name()+"】删除失败！");
@@ -109,10 +126,6 @@ public class ResourceController {
 			Attribute attribute=new Attribute();
 			attribute.setResource_name(resource.getResource_name());
 			attributeMapper.deleteAttributeByResource_nameNoLimit(attribute);
-			Attribute_values attribute_values=new Attribute_values();
-			attribute_values.setResource_name(resource.getResource_name());
-			attribute_valuesMapper.deleteAttribute_valuesByResource_name(attribute_values);
-			map.put("data",resource);
 			map.put("msg","资源【"+resource.getResource_name()+"】删除成功！");
 			map.put("error_code", 1);
 		}else {
@@ -137,13 +150,19 @@ public class ResourceController {
 				map.put("error_code", 0);
 				return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 			}
+			List<String> otherTable=resourceMapper.findOtherTable(resource);
+			if (otherTable.size()==1&&resource.getResource_name().equals(otherTable.get(0))) {
+				resourceMapper.deleteResourceTable(resource);
+			}else{
+				Attribute_values attribute_values=new Attribute_values();
+				attribute_values.setResource_name(resource.getResource_name());
+				attribute_values.setSave_table(resource.getSave_table());
+				attribute_valuesMapper.deleteAttribute_valuesByResource_name(attribute_values);
+			}
 			resourceMapper.deleteResource(resource);
 			Attribute attribute=new Attribute();
 			attribute.setResource_name(resource.getResource_name());
 			attributeMapper.deleteAttributeByResource_nameNoLimit(attribute);
-			Attribute_values attribute_values=new Attribute_values();
-			attribute_values.setResource_name(resource.getResource_name());
-			attribute_valuesMapper.deleteAttribute_valuesByResource_name(attribute_values);
 		}
 			map.put("msg","批量删除资源成功！");
 			map.put("error_code", 1);
@@ -163,6 +182,7 @@ public class ResourceController {
 			map.put("msg","资源【"+resource_name+"】获取成功！");
 			map.put("error_code", 1);
 		}else if(resource==null){
+			map.put("data",resource);
 			map.put("msg","资源获取失败或为空！");
 			map.put("error_code", 0);
 		}
@@ -182,6 +202,7 @@ public class ResourceController {
 			map.put("error_code", 1);
 			log.info("resource："+map);
 		}else if(list.size()<=0){
+			map.put("data",list);
 			map.put("msg","所有资源获取失败或者为空！");
 			map.put("error_code", 0);
 			log.info("resource："+map);

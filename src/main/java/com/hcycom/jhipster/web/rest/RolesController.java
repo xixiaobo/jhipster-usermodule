@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hcycom.jhipster.domain.Attribute_values;
 import com.hcycom.jhipster.domain.Role;
 import com.hcycom.jhipster.service.mapper.Attribute_valuesMapper;
+import com.hcycom.jhipster.service.mapper.ResourceMapper;
 import com.hcycom.jhipster.service.mapper.RoleMapper;
 
 import io.swagger.annotations.Api;
@@ -43,6 +45,9 @@ public class RolesController {
 
 	@Autowired
 	private Attribute_valuesMapper attribute_valuesMapper;
+	
+	@Autowired
+	private ResourceMapper resourceMapper;
 
 	@RequestMapping(value = "/role", method = RequestMethod.POST)
 	@Timed
@@ -125,11 +130,12 @@ public class RolesController {
 				map.put("msg", "角色【" + role.getRole_name() + "】删除失败！");
 				map.put("error_code", 0);
 			} else if (i > 0) {
-				roleMapperr.deleteRole_Auth(role);
 				Attribute_values attribute_values = new Attribute_values();
 				attribute_values.setResource_name("user");
 				attribute_values.setAttribute_key("roles");
 				attribute_values.setValue(uuid + ",");
+				attribute_values.setSave_table(
+						resourceMapper.findResoureByResource_name(attribute_values.getResource_name()).getSave_table());
 				attribute_valuesMapper.replaceUpdateAttribute_values(attribute_values);
 				map.put("data", role);
 				map.put("msg", "角色【" + role.getRole_name() + "】删除成功！");
@@ -157,11 +163,12 @@ public class RolesController {
 				return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 			} else {
 				roleMapperr.deleteRole(role);
-				roleMapperr.deleteRole_Auth(role);
 				Attribute_values attribute_values = new Attribute_values();
 				attribute_values.setResource_name("user");
 				attribute_values.setAttribute_key("roles");
 				attribute_values.setValue(uuid + ",");
+				attribute_values.setSave_table(
+						resourceMapper.findResoureByResource_name(attribute_values.getResource_name()).getSave_table());
 				attribute_valuesMapper.replaceUpdateAttribute_values(attribute_values);
 			}
 
@@ -186,6 +193,7 @@ public class RolesController {
 			map.put("msg", "角色【" + role.getRole_name() + "】获取成功！");
 			map.put("error_code", 1);
 		} else {
+			map.put("data", role);
 			map.put("msg", "角色获取失败或为空！");
 			map.put("error_code", 0);
 		}
@@ -204,7 +212,31 @@ public class RolesController {
 			map.put("msg", "所有角色获取成功！");
 			map.put("error_code", 1);
 		} else if (roles.size() <= 0) {
+			map.put("data", roles);
 			map.put("msg", "所有角色获取失败或为空！");
+			map.put("error_code", 0);
+		} else {
+			map.put("msg", "服务器出问题了！");
+			map.put("error_code", 2);
+		}
+		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/getRoleByLike", method = RequestMethod.GET)
+	@Timed
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleByLike--GET')")
+	@ApiOperation(value = "获取筛选角色", notes = "获取筛选角色", httpMethod = "GET")
+	public ResponseEntity<Map<String, Object>> getRoleByLike(@RequestParam("role_name")String role_name) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		role_name="%"+role_name.replace(" ", "")+"%";
+		List<Role> roles = roleMapperr.getAuthoritybyLike(role_name);
+		if (roles.size() > 0) {
+			map.put("data", roles);
+			map.put("msg", "筛选角色获取成功！");
+			map.put("error_code", 1);
+		} else if (roles.size() <= 0) {
+			map.put("data", roles);
+			map.put("msg", "筛选角色获取失败或为空！");
 			map.put("error_code", 0);
 		} else {
 			map.put("msg", "服务器出问题了！");

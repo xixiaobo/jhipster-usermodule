@@ -19,6 +19,7 @@ import com.hcycom.jhipster.domain.Attribute;
 import com.hcycom.jhipster.domain.Attribute_values;
 import com.hcycom.jhipster.service.mapper.AttributeMapper;
 import com.hcycom.jhipster.service.mapper.Attribute_valuesMapper;
+import com.hcycom.jhipster.service.mapper.ResourceMapper;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +40,9 @@ public class AttributeController {
 
 	@Autowired
 	private Attribute_valuesMapper attribute_valuesMapper;
+	
+	@Autowired
+	private  ResourceMapper resourceMapper;
 
 	@RequestMapping(value = "/attribute", method = RequestMethod.POST)
 	@Timed
@@ -49,12 +53,12 @@ public class AttributeController {
 		int i = attributeMapper.addAttribute(attribute);
 		if (i == 0) {
 			map.put("msg",
-					"资源【" + attribute.getResource_name_foreign() + "】的【" + attribute.getAttribute_name() + "】属性创建失败！");
+					"资源【" + attribute.getResource_name() + "】的【" + attribute.getAttribute_name() + "】属性创建失败！");
 			map.put("error_code", 0);
 		} else if (i > 0) {
 			map.put("data", attribute);
 			map.put("msg",
-					"资源【" + attribute.getResource_name_foreign() + "】的【" + attribute.getAttribute_name() + "】属性创建失败！");
+					"资源【" + attribute.getResource_name() + "】的【" + attribute.getAttribute_name() + "】属性创建失败！");
 			map.put("error_code", 1);
 		} else {
 			map.put("msg", "服务器出问题了！");
@@ -72,12 +76,12 @@ public class AttributeController {
 		int i = attributeMapper.updateAttribute(attribute);
 		if (i == 0) {
 			map.put("msg",
-					"资源【" + attribute.getResource_name_foreign() + "】的【" + attribute.getAttribute_name() + "】属性修改失败！");
+					"资源【" + attribute.getResource_name() + "】的【" + attribute.getAttribute_name() + "】属性修改失败！");
 			map.put("error_code", 0);
 		} else if (i > 0) {
 			map.put("data", attribute);
 			map.put("msg",
-					"资源【" + attribute.getResource_name_foreign() + "】的【" + attribute.getAttribute_name() + "】属性修改成功！");
+					"资源【" + attribute.getResource_name() + "】的【" + attribute.getAttribute_name() + "】属性修改成功！");
 			map.put("error_code", 1);
 		} else {
 			map.put("msg", "服务器出问题了！");
@@ -97,6 +101,7 @@ public class AttributeController {
 			attribute.setResource_name(key);
 			attribute.setAttribute_key(map.get(key) + "");
 			if (map.get(key).equals("")) {
+				String save_table=resourceMapper.findResoureByResource_name(attribute.getResource_name()).getSave_table();
 				int i = attributeMapper.deleteAttributeByResource_nameLimit(attribute);
 				if (i > 0) {
 					List<String> list = attributeMapper.findAttributeByResource_nameNoLimit(attribute);
@@ -107,7 +112,7 @@ public class AttributeController {
 					if (!Listkey.equals("")) {
 						Listkey = Listkey.substring(0, Listkey.length() - 1);
 					}
-					attribute_valuesMapper.deleteAttribute_valuesByResource_nameNolimit(Listkey,"user");
+					attribute_valuesMapper.deleteAttribute_valuesByResource_nameNolimit(Listkey,attribute.getResource_name(),save_table);
 				}
 			} else {
 				attribute=attributeMapper.findAttributeByResource_nameAndAttribute_key(attribute);
@@ -135,18 +140,18 @@ public class AttributeController {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Attribute attribute = new Attribute();
 		attribute.setAttribute_key(attribute_key);
-		attribute.setResource_name_foreign(resource_name);
+		attribute.setResource_name(resource_name);
 		if (attribute.getAttribute_key().equals("") || attribute.getAttribute_key() == null) {
 			List<Attribute> list = attributeMapper.findAttributeByResource_name(attribute);
 			map.put("data", list);
-			map.put("msg", "资源【" + attribute.getResource_name_foreign() + "】的所有属性查询成功！");
+			map.put("msg", "资源【" + attribute.getResource_name() + "】的所有属性查询成功！");
 			map.put("error_code", 0);
 
 		} else {
 			attribute = attributeMapper.findAttributeByResource_nameAndAttribute_key(attribute);
 			map.put("data", attribute);
 			map.put("msg",
-					"资源【" + attribute.getResource_name_foreign() + "】的【" + attribute.getAttribute_key() + "】属性查询成功！");
+					"资源【" + attribute.getResource_name() + "】的【" + attribute.getAttribute_key() + "】属性查询成功！");
 			map.put("error_code", 0);
 		}
 
@@ -165,6 +170,7 @@ public class AttributeController {
 			map.put("msg", "所有资源属性获取成功！");
 			map.put("error_code", 1);
 		} else if (list.size() <= 0) {
+			map.put("data", list);
 			map.put("msg", "所有资源属性获取失败或资源属性为空！");
 			map.put("error_code", 0);
 		} else {

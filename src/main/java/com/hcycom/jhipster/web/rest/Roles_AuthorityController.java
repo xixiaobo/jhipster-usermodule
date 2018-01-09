@@ -3,6 +3,7 @@ package com.hcycom.jhipster.web.rest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -57,13 +58,16 @@ public class Roles_AuthorityController {
 	@ApiOperation(value = "更改角色权限", notes = "传入角色id以及权限id数组，更新角色所拥有的权限", httpMethod = "POST")
 	public ResponseEntity<Map<String, Object>> role_authority(@RequestBody Role_authoritys role_authoritys) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		List<Role_authority> list = role_authorityMapper.getAllRole_authorityByRole_uuid(role_authoritys.getRoleid());
+		List<Role_authority> list = role_authorityMapper.getAllRole_authorityByRole_uuid(role_authoritys.getRoleid(),role_authoritys.getAuthoritytype());
 		List<String> ids = new ArrayList<String>();
 		for (Role_authority role_authority : list) {
 			ids.add(role_authority.getAuthority_uuid());
 		}
-		List<String> ids2 = ids;
+		List<String> ids2 = new ArrayList<String>(ids);
 		List<String> newAuthorityids = new ArrayList<String>(Arrays.asList(role_authoritys.getAuthorityids()));
+		HashSet<String> h = new HashSet<String>(newAuthorityids);   
+		newAuthorityids.clear();   
+		newAuthorityids.addAll(h);
 		ids.removeAll(newAuthorityids);
 		newAuthorityids.removeAll(ids2);
 		for (String id : ids) {
@@ -76,10 +80,11 @@ public class Roles_AuthorityController {
 			Role_authority role_authority = new Role_authority();
 			role_authority.setRole_uuid(role_authoritys.getRoleid());
 			role_authority.setAuthority_uuid(id);
+			role_authority.setAuthority_type(role_authoritys.getAuthoritytype());
 			role_authorityMapper.addRole_authority(role_authority);
 		}
 		map.put("msg", "角色权限变更成功！");
-		map.put("error_code", 0);
+		map.put("error_code", 1);
 
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	}
@@ -96,10 +101,10 @@ public class Roles_AuthorityController {
 		int i = role_authorityMapper.deleteRole_authorityByRoleAndAuthority(role_authority);
 		if (i == 0) {
 			map.put("msg", "角色权限删除失败！");
-			map.put("error_code", 1);
+			map.put("error_code", 0);
 		} else if (i > 0) {
 			map.put("msg", "角色权限删除成功！");
-			map.put("error_code", 0);
+			map.put("error_code", 1);
 		} else {
 			map.put("msg", "服务器出问题了！");
 			map.put("error_code", 2);
@@ -122,10 +127,10 @@ public class Roles_AuthorityController {
 		}
 		if (i == 0) {
 			map.put("msg", "角色权限批量删除失败！");
-			map.put("error_code", 1);
+			map.put("error_code", 0);
 		} else if (i > 0) {
 			map.put("msg", "角色权限批量删除成功！");
-			map.put("error_code", 0);
+			map.put("error_code", 1);
 		} else {
 			map.put("msg", "服务器出问题了！");
 			map.put("error_code", 2);
@@ -142,10 +147,10 @@ public class Roles_AuthorityController {
 			int i = role_authorityMapper.deleteRole_authorityByRole(roleid);
 		if (i == 0) {
 			map.put("msg", "角色所有权限删除失败！");
-			map.put("error_code", 1);
+			map.put("error_code", 0);
 		} else if (i > 0) {
 			map.put("msg", "角色所有权限删除成功！");
-			map.put("error_code", 0);
+			map.put("error_code", 1);
 		} else {
 			map.put("msg", "服务器出问题了！");
 			map.put("error_code", 2);
@@ -183,11 +188,11 @@ public class Roles_AuthorityController {
 	// return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	// }
 
-	@RequestMapping(value = "/getRoleAuthority/{roleid}", method = RequestMethod.GET)
+	@RequestMapping(value = "/getRoleAuthorityByInterface/{roleid}", method = RequestMethod.GET)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleAuthority--GET')")
-	@ApiOperation(value = "获取角色权限", notes = "获取角色拥有的所有权限", httpMethod = "GET")
-	public ResponseEntity<Map<String, Object>> getRoleAuthority(@PathVariable String roleid) {
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleAuthorityByInterface/{roleid}--GET')")
+	@ApiOperation(value = "获取角色的接口权限", notes = "获取角色拥有的所有接口权限", httpMethod = "GET")
+	public ResponseEntity<Map<String, Object>> getRoleAuthorityByInterface(@PathVariable String roleid) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Role role=new Role();
 		role=roleMapper.getUsersAuthority(roleid);
@@ -196,10 +201,10 @@ public class Roles_AuthorityController {
 			map.put("data", list);
 			map.put("roledata", role);
 			map.put("msg", role.getRole_name()+"的所有拥有的接口权限获取成功！");
-			map.put("error_code", 0);
+			map.put("error_code", 1);
 			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 		}
-		List<Role_authority> role_authority = role_authorityMapper.getAllRole_authorityByRole_uuid(roleid);
+		List<Role_authority> role_authority = role_authorityMapper.getRole_authorityByInterfaceAndRole_uuid(roleid);
 		
 		List<Authority> list=new ArrayList<Authority>();
 		for (Role_authority role_authority2 : role_authority) {
@@ -211,12 +216,13 @@ public class Roles_AuthorityController {
 			map.put("data", list);
 			map.put("roledata", role);
 			map.put("msg", role.getRole_name()+"的所有拥有的接口权限获取成功！");
-			map.put("error_code", 0);
+			map.put("error_code", 1);
 			log.info("resource：" + map);
 		} else if(role_authority.size() ==0){
+			map.put("data", list);
 			map.put("roledata", role);
 			map.put("msg", role.getRole_name()+"的所有拥有的接口权限获取失败或为空！");
-			map.put("error_code", 1);
+			map.put("error_code",0);
 			log.info("resource：" + map);
 		}else {
 			map.put("msg", "服务器出问题了！");
@@ -225,20 +231,88 @@ public class Roles_AuthorityController {
 		}
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	}
-
-	@RequestMapping(value = "/getAllInterfaceAuthority", method = RequestMethod.GET)
+	
+	@RequestMapping(value = "/getRoleAuthorityByProduct/{roleid}", method = RequestMethod.GET)
 	@Timed
-	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getAllInterfaceAuthority--GET')")
-	@ApiOperation(value = "获取所有接口权限", notes = "获取所有接口权限记录", httpMethod = "GET")
-	public ResponseEntity<Map<String, Object>> getAllInterfaceAuthority() {
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleAuthorityByProduct/{roleid}--GET')")
+	@ApiOperation(value = "获取角色的产品权限", notes = "获取角色拥有的所有产品权限", httpMethod = "GET")
+	public ResponseEntity<Map<String, Object>> getRoleAuthorityByProduct(@PathVariable String roleid) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		List<Authority> authoritys = authorityMapper.getAllAuthorityByInterface();
-		if (authoritys.size() > 0) {
-			map.put("data", authoritys);
-			map.put("msg", "所有接口权限获取成功！");
-			map.put("error_code", 0);
+		Role role=new Role();
+		role=roleMapper.getUsersAuthority(roleid);
+		if(role.getRole_name().equals("ROLE_ADMIN")){
+			List<Authority> list=authorityMapper.getAllAuthorityByProduct();
+			map.put("data", list);
+			map.put("roledata", role);
+			map.put("msg", role.getRole_name()+"的所有拥有的产品权限获取成功！");
+			map.put("error_code", 1);
+			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+		}
+		List<Role_authority> role_authority = role_authorityMapper.getRole_authorityByProductAndRole_uuid(roleid);
+		
+		List<Authority> list=new ArrayList<Authority>();
+		for (Role_authority role_authority2 : role_authority) {
+			Authority authority=new Authority();
+			authority=authorityMapper.getAuthorityByUuid(role_authority2.getAuthority_uuid());
+			list.add(authority);
+		}
+		if (role_authority.size() >0) {
+			map.put("data", list);
+			map.put("roledata", role);
+			map.put("msg", role.getRole_name()+"的所有拥有的产品权限获取成功！");
+			map.put("error_code", 1);
 			log.info("resource：" + map);
-		} else {
+		} else if(role_authority.size() ==0){
+			map.put("data", list);
+			map.put("roledata", role);
+			map.put("msg", role.getRole_name()+"的所有拥有的产品权限获取失败或为空！");
+			map.put("error_code",0);
+			log.info("resource：" + map);
+		}else {
+			map.put("msg", "服务器出问题了！");
+			map.put("error_code", 2);
+			log.info("resource：" + map);
+		}
+		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getRoleAuthorityByViews/{roleid}", method = RequestMethod.GET)
+	@Timed
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getRoleAuthorityByViews/{roleid}--GET')")
+	@ApiOperation(value = "获取角色的视图权限", notes = "获取角色拥有的所有视图权限", httpMethod = "GET")
+	public ResponseEntity<Map<String, Object>> getRoleAuthorityByViews(@PathVariable String roleid) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Role role=new Role();
+		role=roleMapper.getUsersAuthority(roleid);
+		if(role.getRole_name().equals("ROLE_ADMIN")){
+			List<Authority> list=authorityMapper.getAllAuthorityByViews();
+			map.put("data", list);
+			map.put("roledata", role);
+			map.put("msg", role.getRole_name()+"的所有拥有的视图权限获取成功！");
+			map.put("error_code", 1);
+			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+		}
+		List<Role_authority> role_authority = role_authorityMapper.getRole_authorityByViewsAndRole_uuid(roleid);
+		
+		List<Authority> list=new ArrayList<Authority>();
+		for (Role_authority role_authority2 : role_authority) {
+			Authority authority=new Authority();
+			authority=authorityMapper.getAuthorityByUuid(role_authority2.getAuthority_uuid());
+			list.add(authority);
+		}
+		if (role_authority.size() >0) {
+			map.put("data", list);
+			map.put("roledata", role);
+			map.put("msg", role.getRole_name()+"的所有拥有的视图权限获取成功！");
+			map.put("error_code", 1);
+			log.info("resource：" + map);
+		} else if(role_authority.size() ==0){
+			map.put("data", list);
+			map.put("roledata", role);
+			map.put("msg", role.getRole_name()+"的所有拥有的视图权限获取失败或为空！");
+			map.put("error_code",0);
+			log.info("resource：" + map);
+		}else {
 			map.put("msg", "服务器出问题了！");
 			map.put("error_code", 2);
 			log.info("resource：" + map);

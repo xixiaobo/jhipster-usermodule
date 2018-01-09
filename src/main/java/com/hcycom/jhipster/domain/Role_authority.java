@@ -4,6 +4,7 @@ public class Role_authority {
 	private int uuid;
 	private String role_uuid;
 	private String authority_uuid;
+	private String authority_type;
 	public int getUuid() {
 		return uuid;
 	}
@@ -23,9 +24,17 @@ public class Role_authority {
 	public void setAuthority_uuid(String authority_uuid) {
 		this.authority_uuid = authority_uuid;
 	}
+	
+	public String getAuthority_type() {
+		return authority_type;
+	}
+	public void setAuthority_type(String authority_type) {
+		this.authority_type = authority_type;
+	}
 	@Override
 	public String toString() {
-		return "Role_authority [uuid=" + uuid + ", role_uuid=" + role_uuid + ", authority_uuid=" + authority_uuid + "]";
+		return "Role_authority [uuid=" + uuid + ", role_uuid=" + role_uuid + ", authority_uuid=" + authority_uuid
+				+ ", authority_type=" + authority_type + "]";
 	}
 	
 }
