@@ -154,8 +154,12 @@ public interface Attribute_valuesMapper {
 	 * @return
 	 */
 	@Select("select * from `${attribute_values.save_table}` where resource_name=#{attribute_values.resource_name} "
-			+ "AND attribute_key =#{attribute_values.attribute_key} and value like #{sql}")
+			+ "AND attribute_key =#{attribute_values.attribute_key} and value like ${sql}")
 	public List<String> findAttribute_valuesByKeyAndValue(@Param("attribute_values") Attribute_values attribute_values,
 			@Param("sql") String sql);
+	
+	@Select("select * from `${attribute_values.save_table}`  where resource_name=#{attribute_values.resource_name} AND uuid in (${listID})")
+	public List<Attribute_values> findAttribute_valuesByListID(@Param("listID") String listID,
+			@Param("attribute_values") Attribute_values attribute_values);
 
 }

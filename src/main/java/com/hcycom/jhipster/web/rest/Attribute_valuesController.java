@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +26,7 @@ import com.hcycom.jhipster.service.mapper.ResourceMapper;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * 资源属性值管理接口
@@ -173,13 +175,11 @@ public class Attribute_valuesController {
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/attributevalues_deleteByUUIDMore--DELETE')")
 	@ApiOperation(value = "批量删除资源数据记录", notes = "根据UUID以及资源名称集合批量删除资源数据记录")
-	public ResponseEntity<Map<String, Object>> attributevalues_deleteByUUIDMore(@RequestBody Map<String, String> map) {
+	public ResponseEntity<Map<String, Object>> attributevalues_deleteByUUIDMore(
+			@RequestBody List<Attribute_values> attribute_valuesMore) {
 		Map<String, Object> re = new HashMap<String, Object>();
-		for (String key : map.keySet()) {
-			Attribute_values attribute_values = new Attribute_values();
-			attribute_values.setResource_name(key);
-			attribute_values.setAttribute_key(map.get(key) + "");
-			if (map.get(key).equals("user")) {
+		for (Attribute_values attribute_values : attribute_valuesMore) {
+			if (attribute_values.getResource_name().equals("user")) {
 				re.put("msg", "不可以手动操作用户表请到用户管理处添加！");
 				re.put("error_code", 0);
 				return new ResponseEntity<Map<String, Object>>(re, HttpStatus.OK);
@@ -301,8 +301,8 @@ public class Attribute_valuesController {
 	@Timed
 	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/attributevalues_getByKey--GET')")
 	@ApiOperation(value = "获取资源数据记录", notes = "传入资源数据记录参数，根据资源数据记录的uuid和资源名称获取资源数据记录,如果不传uuid则根据资源名称获取资源记录")
-	public ResponseEntity<Map<String, Object>> attributevalues_getByKey(@RequestParam(value = "key") String key,@RequestParam(value = "value") String value,
-			@RequestParam(value = "resource_name") String resource_name) {
+	public ResponseEntity<Map<String, Object>> attributevalues_getByKey(@RequestParam(value = "key") String key,
+			@RequestParam(value = "value") String value, @RequestParam(value = "resource_name") String resource_name) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Attribute_values attribute_values = new Attribute_values();
 		attribute_values.setAttribute_key(key);
@@ -339,6 +339,89 @@ public class Attribute_valuesController {
 		map.put("error_code", 1);
 
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+	}
+
+	/**
+	 * 获取所有用户表属性
+	 * 
+	 * @return
+	 */
+	@PostMapping("/getattribute_valuesByLike")
+	@Timed
+	@PreAuthorize("@InterfacePermissions.hasPermission(authentication, 'usermodule/api/getattribute_valuesByLike--POST')")
+	@ApiOperation(value = "获取筛选资源属性值", notes = "获取筛选后资源属性值,map:{\"resource_name\":\"你所要查询的资源\",\"你所要查询的字段\":\"你所要查询的值\"},可以查询多个字段", httpMethod = "POST")
+	public ResponseEntity<Map<String, Object>> getusersByLike(
+			@ApiParam(name = "筛选资源属性值", value = "参数模型：{\"resource_name\":\"你所要查询的资源\",\"你所要查询的字段\":\"你所要查询的值\"}") @RequestBody Map<String, Object> map) {
+		List<String> uuids = new ArrayList<String>();
+		String resource_name = "";
+		if (map.containsKey("resource_name")) {
+			resource_name = map.get("resource_name") + "";
+			map.remove("resource_name");
+		} else {
+			Map<String, Object> map3 = new HashMap<String, Object>();
+			map3.put("msg", "资源名称不能为空！");
+			map3.put("error_code", 0);
+			return new ResponseEntity<Map<String, Object>>(map3, HttpStatus.OK);
+		}
+		String save_table=resourceMapper.findResoureByResource_name(resource_name).getSave_table();
+		for (String key : map.keySet()) {
+			Attribute_values attribute_values = new Attribute_values();
+			attribute_values.setResource_name(resource_name);
+			attribute_values.setAttribute_key(key);
+			String value = map.get(key) + "";
+			String sql = "\"%" + value.replace(" ", "") + "%\"";
+			attribute_values.setSave_table(save_table);
+			List<String> list2 = attribute_valuesMapper.findAttribute_valuesByKeyAndValue(attribute_values, sql);
+			list2.removeAll(uuids);
+			uuids.addAll(list2);
+		}
+		String ListID = "\"\",";
+		for (String string : uuids) {
+			ListID += "\"" + string + "\",";
+		}
+		ListID = ListID.substring(0, ListID.length() - 1);
+		Attribute_values attribute_values = new Attribute_values();
+		attribute_values.setResource_name(resource_name);
+		attribute_values.setSave_table(save_table);
+		List<Attribute_values> list = attribute_valuesMapper.findAttribute_valuesByListID(ListID, attribute_values);
+		List<String> liststring = new ArrayList<String>();
+
+		for (Attribute_values value : list) {
+			liststring.add(value.getUuid());
+		}
+		Set<String> set = new HashSet<String>();
+		List<String> newList = new ArrayList<String>();
+		for (String cd : liststring) {
+			if (set.add(cd)) {
+				newList.add(cd);
+			}
+		}
+		List<Map<String, String>> valuesmap = new ArrayList<Map<String, String>>();
+		for (String string : newList) {
+			Map<String, String> valuemap = new HashMap<String, String>();
+			for (Attribute_values values2 : list) {
+				if (values2.getUuid().equals(string)) {
+					valuemap.put(values2.getAttribute_key(), values2.getValue());
+				}
+			}
+			valuesmap.add(valuemap);
+		}
+		Map<String, Object> map3 = new HashMap<String, Object>();
+		if (list.size() > 0) {
+			map.put("data", valuesmap);
+			map3.put("LikeMap", map);
+			map3.put("msg", "成功获取筛选后" + resource_name + "资源属性值！");
+			map3.put("error_code", 1);
+		} else if (list.size() == 0) {
+			map3.put("LikeMap", map);
+			map3.put("msg", "获取筛选后" + resource_name + "资源属性值失败或获取筛选后" + resource_name + "资源属性值为空！");
+			map3.put("error_code", 0);
+		} else {
+			map3.put("msg", "服务器出问题了！");
+			map3.put("error_code", 2);
+		}
+
+		return new ResponseEntity<Map<String, Object>>(map3, HttpStatus.OK);
 	}
 
 	// @RequestMapping(value = "/attributevalues_getAll", method =
